@@ -13,3 +13,7 @@ DOMAIN-SUFFIX,discord.media
 DOMAIN-SUFFIX,discordapp.com
 DOMAIN-SUFFIX,discordapp.net
 DOMAIN,api.nova-oss.com
+DOMAIN,edge.activity.windows.com
+DOMAIN,edge.microsoft.com
+DOMAIN,iecvlist.microsoft.com
+DOMAIN,msedge.api.cdp.microsoft.com
