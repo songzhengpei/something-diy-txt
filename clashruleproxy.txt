@@ -1,7 +1,7 @@
 DOMAIN-KEYWORD,pikpak
 DOMAIN-KEYWORD,tmdb
 DOMAIN-KEYWORD,stream-link
-DOMAIN-SUFFIX,stream-link.online
+DOMAIN-KEYWORD,stream-link.online
 DOMAIN-SUFFIX,dlandroid.rcv.sandai.net
 DOMAIN-SUFFIX,hub5idx.v6.shub.sandai.net
 DOMAIN-SUFFIX,hub5pn.wap.sandai.net
