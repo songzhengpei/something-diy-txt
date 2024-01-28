@@ -1,17 +1,2 @@
-DOMAIN-KEYWORD,pikpak
-DOMAIN-SUFFIX,themoviedb.org
-DOMAIN-SUFFIX,tmdb.org
-DOMAIN-SUFFIX,dlandroid.rcv.sandai.net
-DOMAIN-SUFFIX,hub5idx.v6.shub.sandai.net
-DOMAIN-SUFFIX,hub5pn.wap.sandai.net
-DOMAIN-SUFFIX,hub5pnc.sandai.net
-DOMAIN-SUFFIX,hub5pr.v6.phub.sandai.net
-DOMAIN-SUFFIX,hubciddata.sandai.net
-DOMAIN-SUFFIX,discord.co
-DOMAIN-SUFFIX,discord.com
-DOMAIN-SUFFIX,discord.gg
-DOMAIN-SUFFIX,discord.media
-DOMAIN-SUFFIX,discordapp.com
-DOMAIN-SUFFIX,discordapp.net
 
 
