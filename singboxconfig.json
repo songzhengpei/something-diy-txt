@@ -5,29 +5,38 @@
   },
   "experimental": {
     "clash_api": {
-      "external_controller": "127.0.0.1:9091",
+      "external_controller": "127.0.0.1:9090",
       "external_ui": "ui",
       "secret": "",
-      "external_ui_download_url": "https://mirror.ghproxy.com/https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip",
+      "external_ui_download_url": "https://mirror.ghproxy.com/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
       "external_ui_download_detour": "direct",
       "default_mode": "rule"
     },
   "cache_file": {
     "enabled": true,
-    "store_fakeip": false
+    "store_fakeip": true
     }
   },
   "dns": {
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
     "servers": [
       {
-        "tag": "proxyDns",
-        "address": "tls://8.8.8.8",
+        "tag": "google",
+        "address": "https://8.8.8.8/dns-query",
         "detour": "proxy"
       },
       {
-        "tag": "localDns",
-        "address": "https://223.5.5.5/dns-query",
+        "tag": "tx",
+        "address": "https://120.53.53.53/dns-query",
         "detour": "direct"
+      },
+      {
+        "tag": "fakeip",
+        "address": "fakeip"
       },
       {
         "tag": "block",
@@ -41,58 +50,73 @@
           "cdn.jsdelivr.net",
           "testingcf.jsdelivr.net"
         ],
-        "server": "localDns"
+        "server": "fakeip"
       },
       {
         "outbound": "any",
-        "server": "localDns",
+        "server": "tx",
         "disable_cache": true
       },
       {
         "rule_set": "geosite-cn",
-        "server": "localDns"
+        "server": "tx"
       },   
       {
-        "clash_mode": "direct" ,
-        "server": "localDns"
+        "clash_mode": "direct",
+        "server": "tx"
       },
       {
         "clash_mode": "global",
-        "server": "proxyDns"
+        "server": "fakeip"
+      },
+      {
+        "inbound": "tun",
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakeip",
+        "rewrite_ttl": 1
       },
       {
         "rule_set": "geosite-geolocation-!cn",
-        "server": "proxyDns"
+        "server": "google"
       }
     ],
-    "final": "localDns",
-    "strategy": "prefer_ipv4"
+    "final": "tx",
+    "independent_cache": true
   },
   "inbounds": [
     {
+      "tag": "tun",
       "type": "tun",
-      "inet4_address": "172.19.0.1/30",
-      "inet6_address": "fdfe:dcba:9876::1/126",
-      "mtu": 9000,
-      "auto_route": true,
-      "strict_route": false,
-      "sniff": true,
-      "endpoint_independent_nat": false,
+      "inet4_address": "172.19.0.0/30",
+      "inet6_address": "fdfe:dcba:9876::0/126",
       "stack": "system",
+      "auto_route": true,
+      "sniff": true,
       "platform": {
         "http_proxy": {
           "enabled": true,
           "server": "127.0.0.1",
-          "server_port": 2080
+          "server_port": 7890
         }
       }
     },
     {
+      "tag": "mixed",
       "type": "mixed",
       "listen": "127.0.0.1",
-      "listen_port": 2080,
+      "listen_port": 7890,
+      "sniff": true
+    },
+    {
+      "tag": "loop-in",
+      "type": "mixed",
+      "listen": "127.0.0.1",
+      "listen_port": 7891,
       "sniff": true,
-      "users": []
+      "domain_strategy": "prefer_ipv4"
     }
   ],
   "outbounds": [
@@ -135,6 +159,7 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ],
@@ -151,6 +176,7 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
@@ -166,6 +192,7 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
@@ -181,6 +208,7 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
@@ -197,12 +225,13 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
     },
     {
-      "tag":"GAME",
+      "tag":"Game",
       "type":"selector",
       "outbounds":[
         "direct",
@@ -213,12 +242,13 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
     },
     {
-      "tag":"Bilibili",
+      "tag":"BiliBili",
       "type":"selector",
       "outbounds":[
         "direct",
@@ -229,6 +259,7 @@
         "TaiWan",
         "Singapore",
         "Japan",
+        "Korea",
         "America",
         "Others"
       ]
@@ -246,6 +277,7 @@
         "Singapore",
         "Japan",
         "America",
+        "Korea",
         "Others"
       ],
       "default": "HongKong"
@@ -262,66 +294,88 @@
     },
     {
       "tag":"HongKong",
-      "type":"selector",
+      "type":"urltest",
       "outbounds":[
-        "{all}",
-        "proxy"
+        "{all}"
       ],
       "filter":[
         {"action":"include","keywords":["🇭🇰|HK|hk|香港|港|HongKong"]}
-      ]
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
     },
     {
       "tag":"TaiWan",
-      "type":"selector",
+      "type":"urltest",
       "outbounds":[
-        "{all}",
-        "proxy"
+        "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["🇹🇼|TW|tw|台湾|臺灣|台|Taiwan"]}
-      ]
+        {"action":"include","keywords":["台|新北|彰化|TW|Taiwan"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
     },
     {
       "tag":"Singapore",
-      "type":"selector",
+      "type":"urltest",
       "outbounds":[
-        "{all}",
-        "proxy"
+        "{all}"
       ],
       "filter":[
         {"action":"include","keywords":["🇸🇬|SG|sg|新加坡|狮|Singapore"]}
-      ]
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
     },
     {
       "tag":"Japan",
-      "type":"selector",
+      "type":"urltest",
       "outbounds":[
-        "{all}",
-        "proxy"
+        "{all}"
       ],
       "filter":[
         {"action":"include","keywords":["🇯🇵|JP|jp|日本|日|Japan"]}
-      ]
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
+    },
+    {
+      "tag":"Korea",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["KR|Korea|KOR|首尔|韩|韓"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
     },
     {
       "tag":"America",
-      "type":"selector",
+      "type":"urltest",
       "outbounds":[
-        "{all}",
-        "proxy"
+        "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["🇺🇸|US|us|美国|美|United States"]}
-      ]
+        {"action":"include","keywords":["🇺🇸|美国|美|United States"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
     },
     {
       "tag":"Others",
       "type":"selector",
       "outbounds":[
         "direct",
-        "proxy",
-        "{all}"
+        "proxy"
       ]
     },
     {
@@ -438,7 +492,7 @@
         "outbound": "LLM大模型"
       },
       {
-        "rule_set": "ClaudeAI",
+        "rule_set": "Anthropic",
         "outbound": "LLM大模型"
       },
       {
@@ -463,43 +517,35 @@
       },
       {
         "rule_set": "Epic",
-        "outbound": "GAME"
+        "outbound": "Game"
       },
       {
         "rule_set": "Origin",
-        "outbound": "GAME"
+        "outbound": "Game"
       },
       {
         "rule_set": "Sony",
-        "outbound": "GAME"
+        "outbound": "Game"
       },
       {
         "rule_set": "Steam",
-        "outbound": "GAME"
+        "outbound": "Game"
       },
       {
         "rule_set": "Nintendo",
-        "outbound": "GAME"
+        "outbound": "Game"
       },
       {
-        "rule_set": "BilibiliHMT",
-        "outbound": "Bilibili"
+        "rule_set": "BiliBiliIntl",
+        "outbound": "BiliBili"
       },
       {
-        "rule_set": "Bilibili",
-        "outbound": "Bilibili"
+        "rule_set": "BiliBili",
+        "outbound": "BiliBili"
       },
       {
-        "rule_set": "proxyGFWlist",
+        "rule_set": "gfw",
         "outbound": "proxy"
-      },
-      {
-        "rule_set": "ChinaDomain",
-        "outbound": "direct"
-      },
-      {
-        "rule_set": "ChinaCompanyIp",
-        "outbound": "China"
       },
       {
         "rule_set": "Download",
@@ -520,10 +566,6 @@
       {
         "rule_set": "geosite-cn",
         "outbound": "China"
-      },
-      {
-        "rule_set": "geosite-geolocation-!cn",
-        "outbound": "China"
       }
     ],
     "rule_set": [
@@ -531,28 +573,175 @@
         "tag": "clashruledirect",
         "type": "remote",
         "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/clashruledirect.srs",
+        "url": "https://raw.githubusercontent.com/songzhengpei/sing-box-ruleset/main/rule/clashruledirect.srs",
         "download_detour": "direct"
       },
       {
         "tag": "LocalAreaNetwork",
         "type": "remote",
         "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/LocalAreaNetwork.srs",
+        "url": "https://raw.githubusercontent.com/songzhengpei/sing-box-ruleset/main/rule/LocalAreaNetwork.srs",
         "download_detour": "direct"
       },
       {
         "tag": "UnBan",
         "type": "remote",
         "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/UnBan.srs",
+        "url": "https://raw.githubusercontent.com/songzhengpei/sing-box-ruleset/main/rule/UnBan.srs",
         "download_detour": "direct"
       },
       {
         "tag": "clashruleproxy",
         "type": "remote",
         "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/clashruleproxy.srs",
+        "url": "https://raw.githubusercontent.com/songzhengpei/sing-box-ruleset/main/rule/clashruleproxy.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "YouTube",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/YouTube.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "GoogleFCM",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/GoogleFCM.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Google",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Google.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "OpenAi",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/OpenAI.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Claude",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Claude.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Anthropic",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Anthropic.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Bing",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Bing.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "OneDrive",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/OneDrive.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Microsoft",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Microsoft.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Github",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Github.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Telegram",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Telegram.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Epic",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Epic.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Origin",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Origin.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Sony",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Sony.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Steam",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Steam.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Nintendo",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Nintendo.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "BiliBiliIntl",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/BiliBiliIntl.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "BiliBili",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/BiliBili.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "gfw",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/gfw.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "Download",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/bm7/Download.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "ChinaIpV6",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/songzhengpei/sing-box-ruleset/main/rule/ChinaIpV6.srs",
         "download_detour": "direct"
       },
       {
@@ -560,167 +749,6 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "YouTube",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/YouTube.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "GoogleFCM",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/GoogleFCM.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Google",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Google.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "OpenAi",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/OpenAi.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Claude",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Claude.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "ClaudeAI",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/ClaudeAI.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Bing",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Bing.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "OneDrive",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/OneDrive.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Microsoft",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Microsoft.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Github",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Github.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Telegram",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Telegram.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Epic",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Epic.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Origin",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Origin.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Sony",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Sony.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Steam",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Steam.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Nintendo",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Nintendo.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "BilibiliHMT",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/BilibiliHMT.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Bilibili",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Bilibili.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "proxyGFWlist",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/ProxyGFWlist.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "ChinaDomain",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/ChinaDomain.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "ChinaCompanyIp",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/ChinaCompanyIp.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "Download",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/Download.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "ChinaIpV6",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/songzhengpei/my-sing-box-geosite/main/rule/ChinaIpV6.srs",
         "download_detour": "direct"
       },
       {
