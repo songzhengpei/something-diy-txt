@@ -6,7 +6,3 @@ IP-CIDR,192.168.6.4/31
 IP-CIDR,192.168.6.6/32
 DOMAIN-SUFFIX,xn--ngstr-lra8j.com
 DOMAIN-SUFFIX,services.googleapis.cn
-DOMAIN-KEYWORD,libvio
-DOMAIN-SUFFIX,libvio.pw
-DOMAIN-SUFFIX,libvio.fun
-DOMAIN-SUFFIX,libvio.vip
