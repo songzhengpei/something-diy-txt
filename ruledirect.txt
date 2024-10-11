@@ -4,6 +4,10 @@ IP-CIDR,192.168.6.2/31
 IP-CIDR,192.168.6.4/31
 IP-CIDR,192.168.6.6/32
 IP-CIDR,107.173.199.222/32
+DOMAIN,clash.razord.top
+DOMAIN,yacd.metacubex.one
+DOMAIN,yacd.haishan.me
+DOMAIN,d.metacubex.one
 DOMAIN-SUFFIX,dnsany.com
 DOMAIN-SUFFIX,cmvideo.cn
 DOMAIN-SUFFIX,chinamobile.com
