@@ -1,5 +1,3 @@
-DOMAIN-SUFFIX,xn--ngstr-lra8j.com
-DOMAIN-SUFFIX,googleapis.cn
 DOMAIN-SUFFIX,livednow.com
 DOMAIN-SUFFIX,orz-7.com
 DOMAIN-SUFFIX,4gtv.tv
