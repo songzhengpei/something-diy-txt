@@ -30,7 +30,6 @@ DOMAIN,metrics.icloud.com
 # 小海报
 DOMAIN-SUFFIX,doubanio.com
 # 大封面
-# DOMAIN,image.tmdb.org
 # 弹幕
 DOMAIN,dandanplay.net
 # 网盘规则
