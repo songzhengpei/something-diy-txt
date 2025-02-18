@@ -4,6 +4,4 @@ DOMAIN-SUFFIX,qr.ae
 DOMAIN-SUFFIX,quora.com
 DOMAIN-SUFFIX,quoracdn.net
 
-DOMAIN-SUFFIX,mi.com
-DOMAIN-SUFFIX,baidu.com
 
