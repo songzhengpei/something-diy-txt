@@ -14,3 +14,4 @@ DOMAIN-SUFFIX,ofiii.com
 DOMAIN-SUFFIX,mytvsuper.com
 DOMAIN-SUFFIX,themoviedb.org
 DOMAIN-SUFFIX,tmdb.org
+DOMAIN-SUFFIX,tibet.com
